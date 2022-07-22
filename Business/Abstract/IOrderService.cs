@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entities.Abstract
+namespace Business.Abstract
 {
-    public interface IEntity
+    public interface IOrderService
     {
+        
     }
 }
