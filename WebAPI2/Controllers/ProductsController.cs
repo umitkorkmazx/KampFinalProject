@@ -13,7 +13,7 @@ namespace WebAPI2.Controllers
     public class ProductsController : ControllerBase
     {
         // IoC Container -- Inversion of Control
-        //naming convention
+        // naming convention
         // Loosely coupled
         IProductService _productService;
 
