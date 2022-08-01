@@ -1,27 +1,28 @@
-﻿using System;
+﻿using Core.Entities.Concrete;
+using Core.Extensions;
+using Core.Utilities.Security.Encryption;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Core.Entities.Concrete;
-using Core.Extensions;
-using Core.Utilities.Security.Encryption;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
 
 namespace Core.Utilities.Security.JWT
 {
     public class JwtHelper : ITokenHelper
     {
         public IConfiguration Configuration { get; }
-        private TokenOptions _tokenOptions;
+        public TokenOptions _tokenOptions;
         private DateTime _accessTokenExpiration;
         public JwtHelper(IConfiguration configuration)
         {
             Configuration = configuration;
-            _tokenOptions = configuration.GetSection("TokenOptions").Get<TokenOptions>();
-
+            _tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
+                          //M.Extensions.configuration.binder package ile çözüldü(GET)
         }
         public AccessToken CreateToken(User user, List<OperationClaim> operationClaims)
         {

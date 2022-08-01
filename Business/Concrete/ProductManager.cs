@@ -34,7 +34,7 @@ namespace Business.Concrete
         //MD5 -SHA1 şifreleme algoritmaları hash'lama yapar.
         //Salting salt'lama kullanıcının girdiği şifreye bir kaç hash de bu ekler güvenlik için
         //Claim -- örneğin admin,editör gibi yetkiler (product.add)gibi de olabilir
-        [SecuredOperation("product.add")]
+        //[SecuredOperation("product.add, admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
@@ -49,6 +49,7 @@ namespace Business.Concrete
            
         }
 
+        [CasheAspect]//key,value
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 07)
