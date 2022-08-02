@@ -2,6 +2,8 @@
 using Business.BusinessAspect;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspect.Autofac.Caching;
+using Core.Aspect.Autofac.Transaction;
 using Core.Aspect.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
@@ -34,8 +36,9 @@ namespace Business.Concrete
         //MD5 -SHA1 şifreleme algoritmaları hash'lama yapar.
         //Salting salt'lama kullanıcının girdiği şifreye bir kaç hash de bu ekler güvenlik için
         //Claim -- örneğin admin,editör gibi yetkiler (product.add)gibi de olabilir
-        //[SecuredOperation("product.add, admin")]
+        [SecuredOperation("product.add, admin")]
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
             IResult result =BusinessRules.Run(CheckIfProductCategoryCountCorrect(product.CategoryId), 
@@ -49,7 +52,7 @@ namespace Business.Concrete
            
         }
 
-        [CasheAspect]//key,value
+        [CacheAspect]//key,value
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 07)
@@ -63,7 +66,7 @@ namespace Business.Concrete
         {
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == id));
         }
-
+        [CacheAspect]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
@@ -80,6 +83,7 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Product product)
         {
             return new SuccessResult();
@@ -113,6 +117,18 @@ namespace Business.Concrete
                 return new ErrorResult(Messages.CategoryLimitExceded);
             }
             return new SuccessResult();
+        }
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Product product)
+        {
+            Add(product);
+            if (product.UnitPrice<10)
+            {
+                throw new Exception("");
+
+            }
+            Add(product);
+            return null;
         }
     }
 }
